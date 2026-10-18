@@ -6,7 +6,8 @@
     { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
     { "type": "wokwi-potentiometer", "id": "pot1", "top": 20, "left": -180, "attrs": {} },
     { "type": "wokwi-resistor", "id": "r1", "top": 60, "left": 180, "rotate": 90, "attrs": { "value": "220" } },
-    { "type": "wokwi-led", "id": "led1", "top": -40, "left": 240, "attrs": { "color": "blue" } }
+    { "type": "wokwi-led", "id": "led1", "top": -40, "left": 240, "attrs": { "color": "blue" } },
+    { "type": "wokwi-pushbutton", "id": "btn1", "top" : 200, "left" : -180, "attrs": {"color" : "green"} }
   ],
   "connections": [
     [ "esp:TX", "$serialMonitor:RX", "", [] ],
@@ -16,7 +17,9 @@
     [ "pot1:SIG", "esp:34", "orange", [] ],
     [ "esp:5", "r1:1", "green", [] ],
     [ "r1:2", "led1:A", "green", [] ],
-    [ "led1:C", "esp:GND.1", "black", [] ]
+    [ "led1:C", "esp:GND.1", "black", [] ],
+    [ "btn1:1.l", "esp:4", "green",[] ],
+    [ "btn1:2.l", "esp:GND.1", "black",[] ]
   ],
   "dependencies": {}
 }
