@@ -5,6 +5,7 @@
 #include "MoistureSensor.h"
 #include "Button.h"
 #include "IClock.h"
+#include "ZoneState.h"
 
 using namespace std;
 
@@ -19,7 +20,7 @@ class Zone
 		IClock& clock_;
 		int dryThreshold_;
 		int wetThreshold_;
-		bool manualActive_ = false;
+		ZoneState state_ = ZoneState::Auto;
 		uint32_t manualStartMs_ = 0;
 		uint32_t manualDurationMs_ = 10000;
 		bool wasPressed_ = false;

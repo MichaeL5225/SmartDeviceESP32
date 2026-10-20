@@ -21,43 +21,67 @@ Zone::Zone(IOutputPin& valvePin, const string& name, MoistureSensor& moistureSen
 
 void Zone::update() {
 	
-
 	uint32_t now = clock_.nowMs();
-
 	bool nowPressed = button_.isPressed();
-
-	if (nowPressed && !wasPressed_){
-		manualActive_ = true;
-		manualStartMs_ = now;
-		valve_.open();
-	}
-
+	bool justPressed = nowPressed && !wasPressed_;
 	wasPressed_ = nowPressed;
 
-	if (manualActive_ && now - manualStartMs_ >= manualDurationMs_) {
-		valve_.close();
-		manualActive_ = false;
-	}
+	bool secondPassed = (now - lastSensorReadMs_ >= 1000);
 
-	if (now - lastSensorReadMs_ >= 1000){
+	int moisture = 0;
+
+	if (secondPassed) { // runs every one second
 		lastSensorReadMs_ = now;
 
 		Serial.print("update on ");
 		Serial.print(name_.c_str());
 		Serial.println(" Zone:");
 
-		int moisture = moistureSensor_.read();
+		moisture = moistureSensor_.read();
+	}
 
+	switch (state_) {
+		case ZoneState::Auto:
 
-		if (!manualActive_){
-			if (moisture > wetThreshold_) {
+			if (secondPassed) {
+				if (moisture > wetThreshold_) {
 				valve_.close();
-			}
-			else if (moisture < dryThreshold_) {
+				}
+				else if (moisture < dryThreshold_) {
+					valve_.open();
+				}
+			}	
+				
+			if (justPressed) {
+				state_ = ZoneState::Manual;
+				manualStartMs_ = now;
 				valve_.open();
+				Serial.print(name_.c_str());
+				Serial.println(" manual watering started");
 			}
-		}
-		
+
+			break;
+		case ZoneState::Manual:
+			
+			if (justPressed) {
+				valve_.close();
+				state_ = ZoneState::Auto;
+				Serial.print(name_.c_str());
+				Serial.println(" manual watering cancelled");
+			}
+
+			if (now - manualStartMs_ >= manualDurationMs_) {
+				valve_.close();
+				state_ = ZoneState::Auto;
+				Serial.print(name_.c_str());
+				Serial.println(" manual watering finished");
+			}
+
+
+			break;
+		case ZoneState::Fault:
+
+			break;
 	}
 }
 
