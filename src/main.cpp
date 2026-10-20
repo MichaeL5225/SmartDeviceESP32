@@ -11,11 +11,10 @@ Esp32Clock systemClock;
 Esp32AnalogInput moistureInput(34);
 Esp32Pin valvePin(5);
 MoistureSensor sensor(moistureInput, "Garden Sensor");
-Zone garden(valvePin, "Garden",sensor, 30,60);
 Esp32DigitalInput btnInput(4);
 Button btn(btnInput,systemClock, "Manual button");
+Zone garden(valvePin, "Garden",sensor,btn,systemClock, 30,60);
 
-unsigned long lastUpdate = 0;
 bool wasPressed = false;
 
 void setup() {
@@ -24,11 +23,8 @@ void setup() {
 
 void loop() {
 
-  if (millis() - lastUpdate >= 1000){
-    lastUpdate = millis();
-    garden.update();
-  }
-  btn.update();
+  garden.update(); // the zone runs every iteration but the sensor inside runs every second
+  btn.update(); // runs every loop iteration
   bool isPressedNow = btn.isPressed();
   if(isPressedNow != wasPressed){
     btn.printStatus();
