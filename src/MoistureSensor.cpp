@@ -19,6 +19,10 @@ int MoistureSensor::read() {
 	return lastReading_;
 }
 
+bool MoistureSensor::isAtEdge(int reading) const {
+	return reading == MIN_READING || reading == MAX_READING;
+}
+
 void MoistureSensor::printStatus() const {
 	log("last reading is: " + to_string(lastReading_));
 }

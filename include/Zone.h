@@ -25,6 +25,9 @@ class Zone
 		uint32_t manualDurationMs_ = 10000;
 		bool wasPressed_ = false;
 		uint32_t lastSensorReadMs_ = 0;
+		bool sensorAtEdge_ = false;
+		uint32_t edgeStartMs_ = 0;
+		uint32_t edgeFaultMs_ = 10000;
 
 
 	public:

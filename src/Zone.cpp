@@ -38,6 +38,25 @@ void Zone::update() {
 		Serial.println(" Zone:");
 
 		moisture = moistureSensor_.read();
+		
+		if (moistureSensor_.isAtEdge(moisture)){
+			if (!sensorAtEdge_){
+				sensorAtEdge_ = true;
+				edgeStartMs_ = now;
+			}
+			else {
+				if (state_ != ZoneState::Fault && now - edgeStartMs_ >= edgeFaultMs_) { // has the sensor been at the edge for 10 seconds?
+					state_ = ZoneState::Fault;
+					valve_.close();
+					Serial.print(name_.c_str());                    // which zone has the fault
+					Serial.println(" sensor fault, valve closed");  // what happened
+				}
+			}
+		}
+		else{
+				sensorAtEdge_ = false;
+				edgeStartMs_ = 0;
+		}
 	}
 
 	switch (state_) {
@@ -80,7 +99,7 @@ void Zone::update() {
 
 			break;
 		case ZoneState::Fault:
-
+			
 			break;
 	}
 }
